@@ -65,22 +65,6 @@ Veda AI uses a multi-tier multimodal pipeline that transforms raw physical/digit
 
 ---
 
-## ⚠️ Important Assumptions & Limitations
-
-### Key Assumptions
-1. **API Key Configuration**: Requires a valid `GEMINI_API_KEY` set in the backend environment (`.env`).
-2. **Handwriting Legibility**: Assumes student handwriting is reasonably legible. Extremely faint text, heavy scribbles, or damaged answer sheet scans may lower OCR confidence.
-3. **Language**: Prompts and models are optimized for English-language exam papers and responses.
-4. **Document Formatting**: Assumes question papers contain standard question numbering/labels (e.g., `1`, `Q2`, `3(a)`) to enable reliable segmentation.
-
-### Current Limitations
-1. **Multi-Page Payload Size**: Sending very large multi-page PDF answer sheets (e.g., >20 pages) in a single vision request may approach API token limits or request timeouts.
-2. **Diagram & Visual Geometry Evaluation**: The system focuses primarily on text and conceptual content. Complex geometric drawings, circuit diagrams, or hand-drawn graphs are not currently evaluated for visual accuracy.
-3. **Cloud API Dependency**: Requires active internet connectivity to interact with the Google Gemini API (plagiarism embeddings can run locally on CPU).
-4. **Mathematical & Chemical Notation OCR**: Highly complex non-standard mathematical proofs or organic chemical structure diagrams may occasionally experience OCR precision drops.
-
----
-
 ## 🚀 Quick Start Guide
 
 ### 1. Prerequisites
