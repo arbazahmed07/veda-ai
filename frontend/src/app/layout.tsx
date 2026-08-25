@@ -1,0 +1,41 @@
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import StoreProvider from "@/components/StoreProvider";
+import ClientLayout from "@/components/ClientLayout";
+import { ToastProvider } from "@/components/ui/Toast";
+
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  display: "swap",
+});
+
+export const metadata: Metadata = {
+  title: "VedaAI — AI Teacher's Toolkit",
+  description: "AI-powered answer sheet evaluator and plagiarism detector",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en" className="scroll-smooth">
+      <body
+        className={`${inter.variable} antialiased`}
+        style={{ fontFamily: "var(--font-inter, 'Inter', system-ui, sans-serif)" }}
+      >
+        <StoreProvider>
+          <ToastProvider>
+            <div className="flex h-screen w-screen overflow-hidden">
+              <ClientLayout>{children}</ClientLayout>
+            </div>
+          </ToastProvider>
+        </StoreProvider>
+      </body>
+    </html>
+  );
+}
