@@ -113,8 +113,6 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
                     ? "Students"
                     : pathname.startsWith("/results")
                     ? "Results"
-                    : pathname.startsWith("/plagiarism")
-                    ? "Integrity & Plagiarism"
                     : pathname.startsWith("/profile")
                     ? "Settings & Profile"
                     : "Exams"}
