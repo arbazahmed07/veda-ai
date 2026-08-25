@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef } from "react";
 import {
   Sparkles,
   UploadCloud,
-  FileText,
   X,
   ChevronDown,
   ChevronUp,
@@ -12,11 +11,6 @@ import {
   ChevronRight,
   ZoomIn,
   ZoomOut,
-  RotateCcw,
-  CheckCircle2,
-  AlertCircle,
-  Award,
-  BookOpen,
   ArrowRight,
   ExternalLink,
 } from "lucide-react";

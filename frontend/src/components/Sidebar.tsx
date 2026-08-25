@@ -14,8 +14,6 @@ import {
   ChevronLeft,
   Sparkles,
   LogOut,
-  Building2,
-  User as UserIcon,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect } from "react";

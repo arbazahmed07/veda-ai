@@ -1,7 +1,7 @@
 "use client";
 
 import { useAppSelector } from "@/store/hooks";
-import { User as UserIcon, Mail, Building, Key, Sparkles, Save } from "lucide-react";
+import { Save } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/components/ui/Toast";
 
