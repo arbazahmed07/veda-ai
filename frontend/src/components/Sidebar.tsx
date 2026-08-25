@@ -146,7 +146,7 @@ export default function Sidebar() {
             if (!isExpanded) {
               return (
                 <Link
-                  key={item.href}
+                  key={item.label}
                   href={item.href}
                   title={item.label}
                   className={`flex items-center justify-center w-10 h-10 mx-auto rounded-xl transition-all duration-200 ${
@@ -162,7 +162,7 @@ export default function Sidebar() {
 
             return (
               <Link
-                key={item.href}
+                key={item.label}
                 href={item.href}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 group ${
                   isActive
@@ -216,23 +216,26 @@ export default function Sidebar() {
             </div>
           )}
 
-          {/* School / Institution card */}
+          {/* Logged in User card (Dynamic) */}
           {isExpanded ? (
             <div className="mx-3 mb-4">
-              <div className="bg-[#F5F4F0] rounded-2xl px-3 py-3 flex items-center gap-3">
-                {/* School emblem */}
-                <div className="w-10 h-10 rounded-xl bg-white border border-[#E5E4DF] flex items-center justify-center shrink-0 shadow-sm overflow-hidden p-1">
-                  <svg className="w-6 h-6 text-green-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <circle cx="12" cy="12" r="9" />
-                    <path d="M12 7v10M9 9l6 6M15 9l-6 6" />
-                  </svg>
+              <div className="bg-[#F5F4F0] rounded-2xl px-3 py-2.5 flex items-center gap-3">
+                {/* User Avatar */}
+                <div className="w-10 h-10 rounded-xl bg-[#1A1A1A] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
+                  {user?.name
+                    ? user.name
+                        .split(" ")
+                        .slice(0, 2)
+                        .map((w) => w.charAt(0).toUpperCase())
+                        .join("")
+                    : "U"}
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-[13px] font-bold text-[#1A1A1A] truncate leading-tight">
-                    Delhi Public School
+                    {user?.name || "Teacher"}
                   </p>
                   <p className="text-[11px] text-[#6B7280] truncate leading-tight mt-0.5">
-                    Bokaro Steel City
+                    {user?.email || (user?.role ? user.role.toUpperCase() : "Faculty")}
                   </p>
                 </div>
                 <button
@@ -240,23 +243,17 @@ export default function Sidebar() {
                   title="Sign Out"
                   className="p-1.5 rounded-lg text-[#9CA3AF] hover:text-red-500 hover:bg-red-50 transition-all duration-200 shrink-0"
                 >
-                  <LogOut className="w-3.5 h-3.5" />
+                  <LogOut className="w-4 h-4" />
                 </button>
               </div>
             </div>
           ) : (
-            <div className="flex flex-col items-center gap-2 pb-4 px-2">
-              <div className="w-9 h-9 rounded-xl bg-white border border-[#E5E4DF] flex items-center justify-center text-xs font-bold text-green-700 shadow-sm">
-                DPS
-              </div>
-            </div>
-          )}
-
-          {/* Collapsed bottom section */}
-          {!isExpanded && (
             <div className="flex flex-col items-center gap-3 pb-4 px-2">
-              <div className="w-9 h-9 rounded-xl bg-white border border-[#E5E4DF] flex items-center justify-center text-xs font-bold text-green-700 shadow-sm">
-                DPS
+              <div
+                title={user?.name || "User"}
+                className="w-9 h-9 rounded-xl bg-[#1A1A1A] text-white flex items-center justify-center text-xs font-bold shadow-sm"
+              >
+                {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
               </div>
               <button
                 onClick={toggleCollapsed}

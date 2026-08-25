@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   Menu,
   Bell,
@@ -17,7 +17,6 @@ import { fetchCurrentUser, initTokenFromStorage } from "@/store/slices/authSlice
 import { SidebarProvider, useSidebar } from "@/contexts/SidebarContext";
 
 const publicPaths = ["/", "/login", "/signup"];
-const studentAllowedPaths = ["/results", "/profile"];
 
 /* Inner layout — needs SidebarContext */
 function InnerLayout({ children }: { children: React.ReactNode }) {
@@ -26,28 +25,24 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
   const dispatch = useAppDispatch();
   const { user, token, loading } = useAppSelector((state) => state.auth);
   const { setMobileOpen } = useSidebar();
-
-  useEffect(() => { dispatch(initTokenFromStorage()); }, [dispatch]);
-
-  useEffect(() => {
-    if (token && !user && !loading) dispatch(fetchCurrentUser());
-  }, [token, user, loading, dispatch]);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (!publicPaths.includes(pathname) && !token && !loading) {
+    setMounted(true);
+    dispatch(initTokenFromStorage());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (mounted && token && !user && !loading) {
+      dispatch(fetchCurrentUser());
+    }
+  }, [mounted, token, user, loading, dispatch]);
+
+  useEffect(() => {
+    if (mounted && !publicPaths.includes(pathname) && !token && !loading) {
       router.replace("/login");
     }
-  }, [pathname, token, loading, router]);
-
-  useEffect(() => {
-    if (
-      user?.role === "student" &&
-      !publicPaths.includes(pathname) &&
-      !studentAllowedPaths.includes(pathname)
-    ) {
-      router.replace("/results");
-    }
-  }, [user, pathname, router]);
+  }, [mounted, pathname, token, loading, router]);
 
   const isPublicPage = publicPaths.includes(pathname);
 
@@ -60,8 +55,8 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
     );
   }
 
-  /* Auth loading */
-  if (loading || (!user && token)) {
+  /* SSR or Initial mount loading placeholder */
+  if (!mounted || loading || (!user && token)) {
     return (
       <main className="flex-1 min-w-0 overflow-y-auto flex items-center justify-center bg-[#F5F4F0]">
         <div className="flex flex-col items-center gap-3">
@@ -73,10 +68,6 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
   }
 
   if (!user) return null;
-
-  if (user.role === "student" && !studentAllowedPaths.includes(pathname)) {
-    return null;
-  }
 
   /* ── User initials ── */
   const initials = user.name
