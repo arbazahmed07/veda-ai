@@ -26,12 +26,8 @@ RUN python -m pip install --upgrade pip \
 # Copy application
 COPY . .
 
-# Application port
+# Application port (Render default is 10000 or dynamically set via $PORT)
 EXPOSE 7860
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:7860/health-check')" || exit 1
-
-# Start FastAPI/Uvicorn
-CMD ["python", "-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "7860"]
+# Start FastAPI/Uvicorn — binds to $PORT dynamically if set (Render/Cloud), defaults to 7860
+CMD ["sh", "-c", "python -m uvicorn app:app --host 0.0.0.0 --port ${PORT:-7860}"]

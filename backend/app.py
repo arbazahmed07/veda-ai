@@ -11,47 +11,36 @@ from core.db import database
 # ── Configure logging ─────────────────────────────────────────
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s  %(levelname)-8s  %(name)s \u2014 %(message)s",
+    format="%(asctime)s  %(levelname)-8s  %(name)s — %(message)s",
     datefmt="%H:%M:%S",
 )
 logger = logging.getLogger(__name__)
 
-# ── Allowed origins ───────────────────────────────────────────
-ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://localhost:3001",
-    "http://127.0.0.1:3000",
-    "http://127.0.0.1:3001",
-]
-
+# ── Allowed origins & CORS ─────────────────────────────────────
 app = FastAPI(
     title="GradeAI Backend API",
     description="Intelligent Answer Sheet Evaluator API",
     version="1.0.0",
 )
 
-# CORS \u2014 must use explicit origins when allow_credentials=True
-# (browsers reject wildcard "*" combined with credentials)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS,
+    allow_origin_regex=r"^https?://.*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
-# ── Global exception handler \u2014 always returns CORS headers ────
-# Without this, an unhandled 500 inside a route handler returns
-# a response with no CORS headers and the browser blocks it.
+# ── Global exception handler ──────────────────────────────────
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
-    origin = request.headers.get("origin", "")
-    headers = {}
-    if origin in ALLOWED_ORIGINS:
-        headers["Access-Control-Allow-Origin"] = origin
-        headers["Access-Control-Allow-Credentials"] = "true"
-        headers["Vary"] = "Origin"
+    origin = request.headers.get("origin", "*")
+    headers = {
+        "Access-Control-Allow-Origin": origin if origin else "*",
+        "Access-Control-Allow-Credentials": "true",
+        "Vary": "Origin",
+    }
 
     logger.exception(f"Unhandled error on {request.method} {request.url.path}: {exc}")
     return JSONResponse(
