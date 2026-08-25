@@ -1,8 +1,26 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Veda AI Frontend Application
 
-## Getting Started
+This is the Next.js 15 frontend client for **Veda AI** — an intelligent, AI-powered automated answer sheet evaluation system.
 
-First, run the development server:
+For full project documentation, including the **Approach**, **AI Models & APIs used**, **Assumptions & Limitations**, and **Backend Architecture**, please see the main [Root README](../README.md).
+
+---
+
+## 🛠️ Features
+
+- 📄 **Assessment Mapping UI**: Upload Question Papers and Student Answer Sheets with visual page previews.
+- 🎯 **Bounding Box Visualizer**: View bounding-box overlays (`[ymin, xmin, ymax, xmax]`) mapping student handwritten answers directly onto original sheet pages.
+- 📊 **Detailed Grade Reports**: Concept coverage percentage, score breakdown, strengths, missing topics, and inline mistake highlights (`❌`).
+- ✍️ **AI-Improved Answer View**: Generates reference student answers for learning and review.
+- 🔍 **Plagiarism Dashboard**: Displays peer-to-peer similarity scores (>80%) across student submissions.
+
+---
+
+## 🚀 Getting Started
+
+First, ensure your backend server is running at `http://localhost:7860`.
+
+Run the development server:
 
 ```bash
 npm run dev
@@ -16,21 +34,11 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📖 Tech Stack
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Framework**: [Next.js 15](https://nextjs.org/) (App Router)
+- **Library**: [React 19](https://react.dev/)
+- **Styling**: Tailwind CSS
+- **Icons**: Lucide React
