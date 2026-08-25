@@ -24,11 +24,11 @@ import { logout } from "@/store/slices/authSlice";
 import { useSidebar } from "@/contexts/SidebarContext";
 
 const allNavItems = [
-  { href: "/dashboard",  label: "Home",           icon: Home,          roles: ["teacher", "super_admin", "student"] },
-  { href: "/dashboard",  label: "My Classroom",   icon: LayoutGrid,    roles: ["teacher", "super_admin"] },
-  { href: "/dashboard",  label: "Assignments",     icon: ClipboardList, roles: ["teacher", "super_admin"] },
-  { href: "/dashboard",  label: "Exams",           icon: BookOpen,      roles: ["teacher", "super_admin", "student"] },
-  { href: "/dashboard",  label: "My Library",      icon: Library,       roles: ["teacher", "super_admin", "student"] },
+  { href: "/dashboard",   label: "Home",           icon: Home,          roles: ["teacher", "super_admin", "student"] },
+  { href: "/classroom",   label: "My Classroom",   icon: LayoutGrid,    roles: ["teacher", "super_admin"] },
+  { href: "/assignments", label: "Assignments",     icon: ClipboardList, roles: ["teacher", "super_admin"] },
+  { href: "/dashboard",   label: "Exams",           icon: BookOpen,      roles: ["teacher", "super_admin", "student"] },
+  { href: "/library",     label: "My Library",      icon: Library,       roles: ["teacher", "super_admin", "student"] },
 ];
 
 /* ── VedaAI Square Logo ── */

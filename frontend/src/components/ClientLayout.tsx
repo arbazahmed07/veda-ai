@@ -100,7 +100,25 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
               {/* Breadcrumb */}
               <div className="flex items-center gap-2 text-sm text-[#6B7280]">
                 <FileText className="w-4 h-4 text-[#9CA3AF]" />
-                <span className="font-semibold text-[#1A1A1A]">Exams</span>
+                <span className="font-semibold text-[#1A1A1A]">
+                  {pathname.startsWith("/classroom")
+                    ? "My Classroom"
+                    : pathname.startsWith("/assignments")
+                    ? "Assignments"
+                    : pathname.startsWith("/library")
+                    ? "My Library"
+                    : pathname.startsWith("/analytics")
+                    ? "Analytics"
+                    : pathname.startsWith("/students")
+                    ? "Students"
+                    : pathname.startsWith("/results")
+                    ? "Results"
+                    : pathname.startsWith("/plagiarism")
+                    ? "Integrity & Plagiarism"
+                    : pathname.startsWith("/profile")
+                    ? "Settings & Profile"
+                    : "Exams"}
+                </span>
               </div>
             </div>
 
