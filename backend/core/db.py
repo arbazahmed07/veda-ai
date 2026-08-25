@@ -11,14 +11,22 @@ class Database:
 
     @classmethod
     def connect_db(cls):
-        cls.client = AsyncIOMotorClient(
-            settings.MONGO_URI,
-            serverSelectionTimeoutMS=5000,   # fail fast — 5 s
-            connectTimeoutMS=5000,
-            socketTimeoutMS=10000,
-        )
-        cls.db = cls.client[settings.DB_NAME]
-        logger.info("Connected to MongoDB")
+        try:
+            if settings.MONGO_URI:
+                cls.client = AsyncIOMotorClient(
+                    settings.MONGO_URI,
+                    serverSelectionTimeoutMS=2000,   # fail fast — 2 s
+                    connectTimeoutMS=2000,
+                    socketTimeoutMS=5000,
+                )
+                cls.db = cls.client[settings.DB_NAME]
+                logger.info("Connected to MongoDB")
+            else:
+                logger.info("No MONGO_URI provided — running in pure in-memory mode")
+        except Exception as e:
+            logger.warning(f"MongoDB connection failed: {e}. Running in pure in-memory mode.")
+            cls.client = None
+            cls.db = None
 
     @classmethod
     def close_db(cls):

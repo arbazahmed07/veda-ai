@@ -38,6 +38,13 @@ interface MappedQuestion {
   boxes?: BoundingBox[];
 }
 
+interface UnmappedAnswer {
+  raw_label?: string;
+  transcription?: string;
+  ai_comment?: string;
+  boxes?: BoundingBox[];
+}
+
 interface AssessmentPage {
   page_number: number;
   width: number;
@@ -57,7 +64,7 @@ interface AssessmentResult {
     general_feedback?: string;
   };
   questions: MappedQuestion[];
-  unmapped_answers?: any[];
+  unmapped_answers?: UnmappedAnswer[];
   question_paper_pages: AssessmentPage[];
   answer_sheet_pages: AssessmentPage[];
 }
@@ -78,6 +85,7 @@ export default function AssessmentMappingPage() {
   // Result States
   const [result, setResult] = useState<AssessmentResult | null>(null);
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState<number>(0);
+  const [selectedUnmappedIndex, setSelectedUnmappedIndex] = useState<number | null>(null);
   const [expandedQuestions, setExpandedQuestions] = useState<{ [key: number]: boolean }>({ 0: true });
   const [allExpanded, setAllExpanded] = useState(false);
 
@@ -140,6 +148,7 @@ export default function AssessmentMappingPage() {
       const data: AssessmentResult = res.data;
       setResult(data);
       setSelectedQuestionIndex(0);
+      setSelectedUnmappedIndex(null);
       setExpandedQuestions({ 0: true });
       setCurrentPage(data.questions[0]?.boxes?.[0]?.page || 1);
       showToast("Assessment mapped and graded successfully!", "success");
@@ -155,11 +164,25 @@ export default function AssessmentMappingPage() {
   // Select question and focus answer region
   const handleSelectQuestion = (idx: number) => {
     setSelectedQuestionIndex(idx);
+    setSelectedUnmappedIndex(null);
     setExpandedQuestions((prev) => ({ ...prev, [idx]: !prev[idx] }));
 
     const q = result?.questions[idx];
     if (q && q.boxes && q.boxes.length > 0) {
       const targetPage = q.boxes[0].page;
+      if (targetPage) {
+        setCurrentPage(targetPage);
+      }
+    }
+  };
+
+  // Select unmapped answer
+  const handleSelectUnmapped = (idx: number) => {
+    setSelectedUnmappedIndex(idx);
+    setSelectedQuestionIndex(-1);
+    const item = result?.unmapped_answers?.[idx];
+    if (item && item.boxes && item.boxes.length > 0) {
+      const targetPage = item.boxes[0].page;
       if (targetPage) {
         setCurrentPage(targetPage);
       }
@@ -184,6 +207,7 @@ export default function AssessmentMappingPage() {
     setQpFile(null);
     setAnsFile(null);
     setSelectedQuestionIndex(0);
+    setSelectedUnmappedIndex(null);
     setZoomLevel(100);
     setCurrentPage(1);
   };
@@ -510,6 +534,72 @@ export default function AssessmentMappingPage() {
 
               {/* Questions List */}
               <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3.5">
+                {/* Overall Assessment Summary Card */}
+                {result.summary && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-[#FAF9F6] to-[#FEF0E8]/40 border border-[#E8611A]/20 shadow-sm space-y-3 mb-2"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-xl bg-[#E8611A] text-white flex items-center justify-center font-bold text-xs shadow-sm">
+                          ✦
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-bold text-[#1A1A1A]">
+                            Grading &amp; AI Performance Summary
+                          </h3>
+                          <p className="text-[11px] text-[#6B7280]">
+                            {result.summary.student_name || "Student Assessment"}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="text-right">
+                        <div className="text-lg font-black text-[#1A1A1A]">
+                          {result.summary.total_score} <span className="text-xs text-[#6B7280] font-normal">/ {result.summary.max_score || result.total_marks}</span>
+                        </div>
+                        <span className="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E8611A] text-white">
+                          {result.summary.percentage ?? Math.round(((result.summary.total_score || 0) / (result.total_marks || 1)) * 100)}%
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Progress Bar */}
+                    <div className="w-full h-2 bg-[#E5E4DF] rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-[#E8611A] rounded-full transition-all duration-500"
+                        style={{
+                          width: `${Math.min(100, Math.max(0, result.summary.percentage ?? Math.round(((result.summary.total_score || 0) / (result.total_marks || 1)) * 100)))}%`,
+                        }}
+                      />
+                    </div>
+
+                    {/* Status Pills Breakdown */}
+                    <div className="flex flex-wrap items-center gap-2 text-[11px] font-medium pt-1">
+                      <span className="px-2 py-0.5 rounded-md bg-[#DCFCE7] text-[#15803D] font-bold">
+                        Correct: {result.questions.filter((q) => q.status === "correct").length}
+                      </span>
+                      <span className="px-2 py-0.5 rounded-md bg-[#FEF0E8] text-[#E8611A] font-bold">
+                        Partial: {result.questions.filter((q) => q.status === "partially_correct").length}
+                      </span>
+                      <span className="px-2 py-0.5 rounded-md bg-[#FEE2E2] text-[#B91C1C] font-bold">
+                        Incorrect: {result.questions.filter((q) => q.status === "incorrect").length}
+                      </span>
+                      <span className="px-2 py-0.5 rounded-md bg-[#F3F4F6] text-[#4B5563] font-bold">
+                        Unanswered: {result.questions.filter((q) => q.status === "unanswered" || !q.is_answered).length}
+                      </span>
+                    </div>
+
+                    {result.summary.general_feedback && (
+                      <div className="text-xs text-[#4B5563] bg-white/80 border border-[#E5E4DF] rounded-xl p-3 leading-relaxed italic">
+                        "{result.summary.general_feedback}"
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+
                 {result.questions.map((q, idx) => {
                   const isSelected = selectedQuestionIndex === idx;
                   const isExpanded = expandedQuestions[idx] ?? false;
@@ -608,6 +698,37 @@ export default function AssessmentMappingPage() {
                                 </div>
                               )}
 
+                              {/* Multi-page Answer Bounding Box Chips */}
+                              {q.boxes && q.boxes.length > 0 && (
+                                <div className="space-y-1.5 pt-1">
+                                  <p className="text-[11px] font-semibold text-[#6B7280]">
+                                    Answer Sheet Location ({q.boxes.length} {q.boxes.length === 1 ? "region" : "regions"}):
+                                  </p>
+                                  <div className="flex flex-wrap items-center gap-1.5">
+                                    {q.boxes.map((box, bIdx) => (
+                                      <button
+                                        key={bIdx}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setSelectedQuestionIndex(idx);
+                                          setSelectedUnmappedIndex(null);
+                                          setCurrentPage(box.page);
+                                          setMobileTab("answersheet");
+                                        }}
+                                        className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
+                                          currentPage === box.page && isSelected
+                                            ? "bg-[#22C55E] text-white shadow-sm"
+                                            : "bg-[#F5F4F0] border border-[#E5E4DF] text-[#1A1A1A] hover:bg-[#E5E4DF]"
+                                        }`}
+                                      >
+                                        <span>📍 Page {box.page}</span>
+                                        {q.boxes!.length > 1 && <span className="text-[10px] opacity-80">(Part {bIdx + 1})</span>}
+                                      </button>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
                               {/* Jump to Highlight Button (Mobile) */}
                               <div className="lg:hidden pt-1">
                                 <button
@@ -629,6 +750,59 @@ export default function AssessmentMappingPage() {
                     </motion.div>
                   );
                 })}
+
+                {/* Unmapped / Extra Answers Section */}
+                {result.unmapped_answers && result.unmapped_answers.length > 0 && (
+                  <div className="pt-4 space-y-3 border-t border-[#E5E4DF]">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-xs font-bold text-[#E8611A] uppercase tracking-wider flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-[#E8611A]" />
+                        Unmapped / Extra Answers ({result.unmapped_answers.length})
+                      </h3>
+                      <span className="text-[11px] text-[#6B7280]">Does not match paper questions</span>
+                    </div>
+
+                    <div className="space-y-2.5">
+                      {result.unmapped_answers.map((unmapped, uIdx) => {
+                        const isSelectedUnmapped = selectedUnmappedIndex === uIdx;
+                        return (
+                          <motion.div
+                            key={uIdx}
+                            onClick={() => handleSelectUnmapped(uIdx)}
+                            className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
+                              isSelectedUnmapped
+                                ? "border-2 border-[#F59E0B] bg-[#FFFBEB] shadow-md"
+                                : "border-[#E5E4DF] bg-white hover:border-[#D1D5DB]"
+                            }`}
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <span className="text-xs font-bold text-[#D97706] bg-[#FEF3C7] px-2 py-0.5 rounded-md">
+                                {unmapped.raw_label || `Extra Answer #${uIdx + 1}`}
+                              </span>
+                              {unmapped.boxes?.[0]?.page && (
+                                <span className="text-[11px] font-semibold text-[#6B7280]">
+                                  📍 Page {unmapped.boxes[0].page}
+                                </span>
+                              )}
+                            </div>
+
+                            {unmapped.transcription && (
+                              <p className="text-xs text-[#1A1A1A] italic mt-2 bg-[#FAF9F6] p-2 rounded-lg border border-[#E5E4DF]">
+                                "{unmapped.transcription}"
+                              </p>
+                            )}
+
+                            {unmapped.ai_comment && (
+                              <p className="text-xs text-[#6B7280] mt-1.5">
+                                💡 {unmapped.ai_comment}
+                              </p>
+                            )}
+                          </motion.div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -720,7 +894,7 @@ export default function AssessmentMappingPage() {
                         return (
                           <div
                             key={`${qIdx}-${bIdx}`}
-                            onClick={() => setSelectedQuestionIndex(qIdx)}
+                            onClick={() => handleSelectQuestion(qIdx)}
                             style={{ top, left, width, height }}
                             className={`absolute rounded-xl transition-all duration-200 cursor-pointer ${
                               isSelected
@@ -737,6 +911,42 @@ export default function AssessmentMappingPage() {
                               }`}
                             >
                               Q{q.question_number}
+                            </span>
+                          </div>
+                        );
+                      });
+                    })}
+
+                    {/* Render Unmapped Answer Bounding Boxes on current page */}
+                    {result.unmapped_answers?.map((uItem, uIdx) => {
+                      const uBoxes = uItem.boxes?.filter((b) => b.page === currentPage) || [];
+                      const isUnmappedSelected = selectedUnmappedIndex === uIdx;
+
+                      return uBoxes.map((box, bIdx) => {
+                        const top = `${box.ymin / 10}%`;
+                        const left = `${box.xmin / 10}%`;
+                        const height = `${(box.ymax - box.ymin) / 10}%`;
+                        const width = `${(box.xmax - box.xmin) / 10}%`;
+
+                        return (
+                          <div
+                            key={`u-${uIdx}-${bIdx}`}
+                            onClick={() => handleSelectUnmapped(uIdx)}
+                            style={{ top, left, width, height }}
+                            className={`absolute rounded-xl transition-all duration-200 cursor-pointer ${
+                              isUnmappedSelected
+                                ? "border-[3px] border-[#F59E0B] bg-[#F59E0B]/20 ring-4 ring-[#F59E0B]/30 shadow-lg z-20"
+                                : "border-2 border-dashed border-[#F59E0B]/70 bg-[#F59E0B]/10 hover:border-[#F59E0B] z-10"
+                            }`}
+                          >
+                            <span
+                              className={`absolute -top-3.5 left-2 px-2.5 py-0.5 rounded-md text-[11px] font-black shadow-md ${
+                                isUnmappedSelected
+                                  ? "bg-[#F59E0B] text-white"
+                                  : "bg-[#D97706] text-white opacity-90"
+                              }`}
+                            >
+                              {uItem.raw_label || "Extra Answer"}
                             </span>
                           </div>
                         );

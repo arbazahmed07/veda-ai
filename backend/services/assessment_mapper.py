@@ -178,7 +178,13 @@ class AssessmentMapperService:
            - "ai_feedback": "Question was left unanswered by the student."
 
         4. If there are handwritten answers that DO NOT match any question in the paper:
-           - Add them to "unmapped_answers".
+           - Add them to "unmapped_answers" array with this structure:
+             {{
+               "raw_label": "Unmatched Answer / Extra Question",
+               "transcription": "Transcribed handwritten text",
+               "ai_comment": "Reason why it does not match any paper question",
+               "boxes": [{{"page": 1, "ymin": 800, "xmin": 50, "ymax": 950, "xmax": 900}}]
+             }}
 
         Output JSON strictly matching this structure:
         {{
