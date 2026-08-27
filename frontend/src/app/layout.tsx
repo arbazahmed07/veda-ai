@@ -45,7 +45,7 @@ export default function RootLayout({
       >
         <StoreProvider>
           <ToastProvider>
-            <div className="flex h-screen w-screen overflow-hidden">
+            <div className="flex h-screen h-[100dvh] w-full max-w-full overflow-hidden">
               <ClientLayout>{children}</ClientLayout>
             </div>
           </ToastProvider>

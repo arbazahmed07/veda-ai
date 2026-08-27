@@ -74,7 +74,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
   /* Public pages — no shell */
   if (isPublicPage) {
     return (
-      <main className="flex-1 min-w-0 overflow-y-auto bg-[#F5F4F0]">
+      <main className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden bg-[#F5F4F0]">
         {children}
       </main>
     );
@@ -83,7 +83,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
   /* SSR or Initial mount loading placeholder */
   if (!mounted || loading || (!user && token)) {
     return (
-      <main className="flex-1 min-w-0 overflow-y-auto flex items-center justify-center bg-[#F5F4F0]">
+      <main className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden flex items-center justify-center bg-[#F5F4F0]">
         <div className="flex flex-col items-center gap-3">
           <div className="w-6 h-6 rounded-full border-2 border-[#E5E4DF] border-t-[#E8611A] animate-spin" />
           <p className="text-sm text-[#9CA3AF]">Loading…</p>
@@ -105,7 +105,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
     <>
       <Sidebar />
 
-      <main className="flex-1 min-w-0 overflow-y-auto flex flex-col bg-[#F5F4F0]">
+      <main className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden flex flex-col bg-[#F5F4F0]">
 
         {/* ── Top Header Bar (White Background with Border Radius) ── */}
         <div className="sticky top-0 z-30 px-3 sm:px-5 pt-3 shrink-0">
@@ -265,7 +265,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
       </div>
 
         {/* ── Page content ── */}
-        <div className="flex-1 flex flex-col min-h-0 overflow-y-auto">
+        <div className="flex-1 flex flex-col min-h-0">
           {children}
         </div>
 
