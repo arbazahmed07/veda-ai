@@ -83,28 +83,27 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
 
       <main className="flex-1 min-w-0 overflow-y-auto flex flex-col bg-[#F5F4F0]">
 
-        {/* ── Top Header Bar ── */}
-        <header className="sticky top-0 z-30 shrink-0 bg-[#F5F4F0]/95 backdrop-blur-sm border-b border-[#E5E4DF] px-4 sm:px-6">
-          <div className="flex items-center justify-between h-14">
+        {/* ── Top Header Bar (White Background with Border Radius) ── */}
+        <div className="sticky top-0 z-30 px-3 sm:px-5 pt-3 shrink-0">
+          <header className="bg-white border border-[#E5E4DF] rounded-2xl px-4 sm:px-6 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+            <div className="flex items-center justify-between h-13 sm:h-14">
 
-            {/* ── Left: mobile back + brand / desktop breadcrumb ── */}
-            <div className="flex items-center gap-2.5">
-              {/* Mobile back arrow */}
+            {/* ── Left: Back Button + Page Title / Breadcrumb ── */}
+            <div className="flex items-center gap-2 sm:gap-3">
+              {/* Back button */}
               <button
-                className="lg:hidden p-2 -ml-1 rounded-xl text-[#6B7280] hover:text-[#1A1A1A] hover:bg-[#ECEAE4] transition-colors shrink-0"
+                className="w-8 h-8 rounded-full flex items-center justify-center text-[#1A1A1A] hover:bg-[#F5F4F0] transition-colors shrink-0 cursor-pointer"
                 onClick={() => router.back()}
                 aria-label="Go back"
+                title="Go back"
               >
-                <ArrowLeft className="w-5 h-5" />
+                <ArrowLeft className="w-4 h-4 text-[#1A1A1A]" strokeWidth="2.2" />
               </button>
 
-              {/* Mobile brand name */}
-              <span className="lg:hidden text-[15px] font-bold text-[#1A1A1A] tracking-tight">VedaAI</span>
-
-              {/* Desktop breadcrumb */}
-              <div className="hidden lg:flex items-center gap-2 text-sm text-[#6B7280]">
+              {/* Page Breadcrumb Title */}
+              <div className="flex items-center gap-2 text-sm">
                 <FileText className="w-4 h-4 text-[#9CA3AF]" />
-                <span className="font-semibold text-[#1A1A1A]">
+                <span className="font-semibold text-[#1A1A1A] text-[14.5px]">
                   {pathname.startsWith("/classroom")
                     ? "My Classroom"
                     : pathname.startsWith("/assignments")
@@ -129,7 +128,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
               {/* Help Button (Circular) */}
               <button
                 aria-label="Help"
-                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#ECEAE4]/80 hover:bg-[#E2DFD7] flex items-center justify-center text-[#1A1A1A] transition-colors shrink-0 shadow-sm"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#F5F4F0] hover:bg-[#ECEAE4] flex items-center justify-center text-[#1A1A1A] transition-colors shrink-0 shadow-sm cursor-pointer"
               >
                 <HelpCircle className="w-5 h-5 text-[#1A1A1A]" strokeWidth="2" />
               </button>
@@ -137,7 +136,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
               {/* Notifications Button (Circular with dot) */}
               <button
                 aria-label="Notifications"
-                className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#ECEAE4]/80 hover:bg-[#E2DFD7] flex items-center justify-center text-[#1A1A1A] transition-colors shrink-0 shadow-sm"
+                className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#F5F4F0] hover:bg-[#ECEAE4] flex items-center justify-center text-[#1A1A1A] transition-colors shrink-0 shadow-sm cursor-pointer"
               >
                 <Bell className="w-5 h-5 text-[#1A1A1A]" strokeWidth="2" />
                 {/* Vibrant notification dot */}
@@ -147,7 +146,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
               {/* AI Sparkle Star Button (Circular) */}
               <button
                 aria-label="AI Features"
-                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#ECEAE4]/80 hover:bg-[#E2DFD7] flex items-center justify-center text-[#1A1A1A] transition-colors shrink-0 shadow-sm"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#F5F4F0] hover:bg-[#ECEAE4] flex items-center justify-center text-[#1A1A1A] transition-colors shrink-0 shadow-sm cursor-pointer"
               >
                 <svg className="w-4 h-4 text-[#1A1A1A] fill-[#1A1A1A]" viewBox="0 0 24 24">
                   <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" />
@@ -157,7 +156,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
               {/* User avatar + name dropdown (desktop) */}
               <Link
                 href="/profile"
-                className="hidden sm:flex items-center gap-2.5 pl-1.5 pr-2 py-1 rounded-full hover:bg-[#ECEAE4]/80 transition-colors group cursor-pointer"
+                className="hidden sm:flex items-center gap-2.5 pl-1.5 pr-2 py-1 rounded-full hover:bg-[#F5F4F0] transition-colors group cursor-pointer"
               >
                 <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#1A1A1A] via-[#333333] to-[#E8611A] flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-sm overflow-hidden border border-black/10">
                   {user?.name ? (
@@ -196,6 +195,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         </header>
+      </div>
 
         {/* ── Page content ── */}
         <div className="flex-1 flex flex-col min-h-0 overflow-y-auto">
