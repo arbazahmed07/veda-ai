@@ -45,8 +45,13 @@ export default function SignupPage() {
         className="w-full max-w-md"
       >
         <div className="text-center mb-8">
-          <div className="w-14 h-14 bg-[#1A1A1A] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-            <span className="text-white font-black text-2xl">V</span>
+          <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md overflow-hidden">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/veda-ai-logo.png"
+              alt="VedaAI Logo"
+              className="w-full h-full object-contain"
+            />
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-[#1A1A1A]">
             Create Account

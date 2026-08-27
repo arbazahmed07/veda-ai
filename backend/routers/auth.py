@@ -45,7 +45,9 @@ class UpdateStudentRequest(BaseModel):
 
 
 class UpdateProfileRequest(BaseModel):
-    name: str
+    name: Optional[str] = None
+    school_name: Optional[str] = None
+    city: Optional[str] = None
 
 
 class ChangePasswordRequest(BaseModel):
@@ -130,17 +132,26 @@ async def get_me(user=Depends(get_current_user)):
 # ═══════════════════════════════════════════════════════════════
 @router.put("/profile")
 async def update_profile(req: UpdateProfileRequest, user=Depends(get_current_user)):
-    name = req.name.strip()
-    if not name:
-        raise HTTPException(status_code=400, detail="Name cannot be empty")
+    updates = {}
+    if req.name is not None:
+        name = req.name.strip()
+        if not name:
+            raise HTTPException(status_code=400, detail="Name cannot be empty")
+        updates["name"] = name
+    if req.school_name is not None:
+        updates["school_name"] = req.school_name.strip()
+    if req.city is not None:
+        updates["city"] = req.city.strip()
+
+    if updates:
+        users = database.get_users_collection()
+        await users.update_one({"user_id": user["user_id"]}, {"$set": updates})
 
     users = database.get_users_collection()
-    await users.update_one({"user_id": user["user_id"]}, {"$set": {"name": name}})
-
     updated = await users.find_one({"user_id": user["user_id"]})
     updated.pop("_id", None)
     updated.pop("password_hash", None)
-    logger.info(f"Profile updated: {user['email']} → name={name}")
+    logger.info(f"Profile updated: {user['email']} → {updates}")
     return updated
 
 

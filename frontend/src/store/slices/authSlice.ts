@@ -6,6 +6,8 @@ export interface User {
   name: string;
   email: string;
   role: "teacher" | "student" | "super_admin";
+  school_name?: string;
+  city?: string;
 }
 
 interface AuthState {
@@ -57,7 +59,7 @@ export const signup = createAsyncThunk(
 
 export const updateProfile = createAsyncThunk(
   "auth/updateProfile",
-  async (data: { name: string }, { rejectWithValue }) => {
+  async (data: { name?: string; school_name?: string; city?: string }, { rejectWithValue }) => {
     try {
       const res = await apiClient.put("/auth/profile", data);
       return res.data as User;
@@ -92,9 +94,24 @@ const authSlice = createSlice({
       state.error = "";
       localStorage.removeItem("token");
     },
+    setLocalUserProfile(state, action: PayloadAction<{ name?: string; school_name?: string; city?: string }>) {
+      if (state.user) {
+        state.user = { ...state.user, ...action.payload };
+      }
+      if (typeof window !== "undefined") {
+        if (action.payload.school_name !== undefined) localStorage.setItem("user_school_name", action.payload.school_name);
+        if (action.payload.city !== undefined) localStorage.setItem("user_city", action.payload.city);
+      }
+    },
     initTokenFromStorage(state) {
       if (typeof window !== "undefined") {
         state.token = localStorage.getItem("token");
+        const cachedSchool = localStorage.getItem("user_school_name");
+        const cachedCity = localStorage.getItem("user_city");
+        if (state.user) {
+          if (cachedSchool) state.user.school_name = cachedSchool;
+          if (cachedCity) state.user.city = cachedCity;
+        }
       }
     },
     clearAuthError(state) {
@@ -111,6 +128,12 @@ const authSlice = createSlice({
         state.loading = false;
         state.token = action.payload.token;
         state.user = action.payload.user;
+        if (typeof window !== "undefined" && state.user) {
+          const cachedSchool = localStorage.getItem("user_school_name");
+          const cachedCity = localStorage.getItem("user_city");
+          if (!state.user.school_name && cachedSchool) state.user.school_name = cachedSchool;
+          if (!state.user.city && cachedCity) state.user.city = cachedCity;
+        }
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
@@ -124,6 +147,12 @@ const authSlice = createSlice({
         state.loading = false;
         state.token = action.payload.token;
         state.user = action.payload.user;
+        if (typeof window !== "undefined" && state.user) {
+          const cachedSchool = localStorage.getItem("user_school_name");
+          const cachedCity = localStorage.getItem("user_city");
+          if (!state.user.school_name && cachedSchool) state.user.school_name = cachedSchool;
+          if (!state.user.city && cachedCity) state.user.city = cachedCity;
+        }
       })
       .addCase(signup.rejected, (state, action) => {
         state.loading = false;
@@ -135,7 +164,13 @@ const authSlice = createSlice({
       })
       .addCase(updateProfile.fulfilled, (state, action) => {
         state.loading = false;
-        if (state.user) state.user = { ...state.user, ...action.payload };
+        if (state.user) {
+          state.user = { ...state.user, ...action.payload };
+        }
+        if (typeof window !== "undefined") {
+          if (action.payload.school_name) localStorage.setItem("user_school_name", action.payload.school_name);
+          if (action.payload.city) localStorage.setItem("user_city", action.payload.city);
+        }
       })
       .addCase(updateProfile.rejected, (state, action) => {
         state.loading = false;
@@ -147,6 +182,12 @@ const authSlice = createSlice({
       .addCase(fetchCurrentUser.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload;
+        if (typeof window !== "undefined" && state.user) {
+          const cachedSchool = localStorage.getItem("user_school_name");
+          const cachedCity = localStorage.getItem("user_city");
+          if (!state.user.school_name && cachedSchool) state.user.school_name = cachedSchool;
+          if (!state.user.city && cachedCity) state.user.city = cachedCity;
+        }
       })
       .addCase(fetchCurrentUser.rejected, (state) => {
         state.loading = false;
@@ -156,6 +197,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, initTokenFromStorage, clearAuthError } =
+export const { logout, initTokenFromStorage, clearAuthError, setLocalUserProfile } =
   authSlice.actions;
 export default authSlice.reducer;

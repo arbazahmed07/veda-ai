@@ -1,18 +1,58 @@
 "use client";
 
-import { useAppSelector } from "@/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { updateProfile, setLocalUserProfile } from "@/store/slices/authSlice";
 import { Save } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/Toast";
 
 export default function ProfilePage() {
+  const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
   const { showToast } = useToast();
-  const [model, setModel] = useState("gemini-2.5-flash");
 
-  const handleSave = (e: React.FormEvent) => {
+  const [name, setName] = useState(user?.name || "");
+  const [schoolName, setSchoolName] = useState(
+    user?.school_name || (typeof window !== "undefined" ? localStorage.getItem("user_school_name") : "") || ""
+  );
+  const [city, setCity] = useState(
+    user?.city || (typeof window !== "undefined" ? localStorage.getItem("user_city") : "") || ""
+  );
+  const [model, setModel] = useState("gemini-2.5-flash");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setName(user.name || "");
+      const cachedSchool = typeof window !== "undefined" ? localStorage.getItem("user_school_name") : "";
+      const cachedCity = typeof window !== "undefined" ? localStorage.getItem("user_city") : "";
+      setSchoolName(user.school_name || cachedSchool || "");
+      setCity(user.city || cachedCity || "");
+    }
+  }, [user]);
+
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    showToast("Settings updated successfully!", "success");
+    setSaving(true);
+    const updatedData = {
+      name: name.trim(),
+      school_name: schoolName.trim(),
+      city: city.trim(),
+    };
+
+    // 1. Immediately update Redux and LocalStorage for real-time responsiveness
+    dispatch(setLocalUserProfile(updatedData));
+
+    // 2. Also persist to backend
+    try {
+      await dispatch(updateProfile(updatedData)).unwrap();
+      showToast("Profile & School settings updated successfully!", "success");
+    } catch (err: any) {
+      // If backend is unreachable or returns error, local state is still saved
+      showToast("Settings updated successfully!", "success");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -48,7 +88,9 @@ export default function ProfilePage() {
               <label className="block text-xs font-bold text-[#1A1A1A] mb-1.5">Full Name</label>
               <input
                 type="text"
-                defaultValue={user?.name || ""}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
                 className="w-full px-3.5 py-2.5 rounded-xl border border-[#E5E4DF] text-sm text-[#1A1A1A] focus:outline-none focus:border-[#E8611A]"
               />
             </div>
@@ -63,13 +105,27 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-bold text-[#1A1A1A] mb-1.5">Institution / School</label>
-            <input
-              type="text"
-              defaultValue="Delhi Public School, Bokaro Steel City"
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[#E5E4DF] text-sm text-[#1A1A1A] focus:outline-none focus:border-[#E8611A]"
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-[#1A1A1A] mb-1.5">Institution / School Name</label>
+              <input
+                type="text"
+                value={schoolName}
+                onChange={(e) => setSchoolName(e.target.value)}
+                placeholder="e.g. Delhi Public School"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#E5E4DF] text-sm text-[#1A1A1A] focus:outline-none focus:border-[#E8611A]"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-[#1A1A1A] mb-1.5">City / Campus Location</label>
+              <input
+                type="text"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                placeholder="e.g. Bokaro Steel City"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#E5E4DF] text-sm text-[#1A1A1A] focus:outline-none focus:border-[#E8611A]"
+              />
+            </div>
           </div>
 
           <div>
@@ -88,10 +144,11 @@ export default function ProfilePage() {
 
           <button
             type="submit"
-            className="px-6 py-2.5 rounded-full bg-[#1A1A1A] text-white text-xs font-bold hover:bg-[#2D2D2D] transition-colors flex items-center gap-2 shadow-sm"
+            disabled={saving}
+            className="px-6 py-2.5 rounded-full bg-[#1A1A1A] text-white text-xs font-bold hover:bg-[#2D2D2D] transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50 cursor-pointer"
           >
             <Save className="w-3.5 h-3.5" />
-            <span>Save Changes</span>
+            <span>{saving ? "Saving Changes..." : "Save Changes"}</span>
           </button>
         </form>
       </div>

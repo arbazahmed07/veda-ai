@@ -227,13 +227,16 @@ export default function AssessmentMappingPage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center space-y-2 mb-6"
           >
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#1A1A1A] tracking-tight">
+            <h1
+              className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#1A1A1A] tracking-tight"
+              style={{ fontFamily: "var(--font-bricolage, 'Bricolage Grotesque', sans-serif)" }}
+            >
               Upload{" "}
               <span className="bg-[#FEF0E8] text-[#E8611A] px-3.5 py-1 rounded-2xl inline-block">
                 Question Paper &amp; Answer Sheets
               </span>
             </h1>
-            <p className="text-sm sm:text-base text-[#6B7280]">
+            <p className="text-sm sm:text-base text-[#1A1A1A] font-medium">
               Upload both files to get started
             </p>
           </motion.div>
@@ -243,33 +246,49 @@ export default function AssessmentMappingPage() {
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.1 }}
-            className="mb-8"
+            className="mb-8 select-none"
           >
-            <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-gradient-to-b from-[#FEF0E8] to-[#FCE4D6] p-1.5 flex items-center justify-center shadow-inner">
-              <div className="w-full h-full rounded-full bg-white flex items-center justify-center overflow-hidden shadow-sm">
-                <svg className="w-20 h-20" viewBox="0 0 64 64" fill="none">
-                  <circle cx="32" cy="24" r="14" fill="#FCE4D6" />
-                  <path d="M20 20C20 13.37 25.37 8 32 8C38.63 8 44 13.37 44 20C44 22 43.5 24 42 26C39 23 37 21 32 21C27 21 25 23 22 26C20.5 24 20 22 20 20Z" fill="#2D2D2D" />
-                  <rect x="25" y="21" width="14" height="6" rx="2" stroke="#1A1A1A" strokeWidth="2" fill="none" />
-                  <circle cx="28" cy="24" r="1.5" fill="#1A1A1A" />
-                  <circle cx="36" cy="24" r="1.5" fill="#1A1A1A" />
-                  <path d="M29 30C30.5 31.5 33.5 31.5 35 30" stroke="#E8611A" strokeWidth="2" strokeLinecap="round" />
-                  <path d="M14 54C14 44.05 22.05 36 32 36C41.95 36 50 44.05 50 54V56H14V54Z" fill="#1A1A1A" />
-                  <polygon points="32,38 27,48 37,48" fill="#E8611A" />
-                  <rect x="24" y="44" width="16" height="12" rx="2" fill="#FFFFFF" stroke="#E5E4DF" strokeWidth="1.5" />
+            <div className="relative w-44 h-44 sm:w-52 sm:h-52 md:w-56 md:h-56 flex items-center justify-center mx-auto">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/image.png"
+                alt="Teacher Illustration"
+                className="w-full h-full object-contain pointer-events-none drop-shadow-sm select-none"
+              />
+
+              {/* Orbiting Orange Icon Badge 1: Document (Left ~9:00) */}
+              <div className="absolute left-0 top-[48%] -translate-y-1/2 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#E8611A] text-white flex items-center justify-center shadow-md z-20">
+                <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="4" y="3" width="16" height="18" rx="2" />
+                  <line x1="8" y1="8" x2="16" y2="8" />
+                  <line x1="8" y1="12" x2="16" y2="12" />
+                  <line x1="8" y1="16" x2="12" y2="16" />
                 </svg>
               </div>
 
-              {/* Decorative mini badges */}
-              <span className="absolute top-1 left-2 w-5 h-5 rounded-full bg-[#E8611A] text-white flex items-center justify-center text-[10px] font-bold shadow-md">
-                ✓
-              </span>
-              <span className="absolute top-2 right-1 w-5 h-5 rounded-full bg-[#1A1A1A] text-white flex items-center justify-center text-[10px] font-bold shadow-md">
-                ✦
-              </span>
-              <span className="absolute bottom-2 left-1 w-5 h-5 rounded-full bg-[#E8611A] text-white flex items-center justify-center text-[9px] font-bold shadow-md">
-                AI
-              </span>
+              {/* Orbiting Orange Icon Badge 2: Clock (Top Right ~1:30) */}
+              <div className="absolute right-7 sm:right-9 top-2 sm:top-3 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#E8611A] text-white flex items-center justify-center shadow-md z-20">
+                <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="9" />
+                  <polyline points="12 7 12 12 15 14" />
+                </svg>
+              </div>
+
+              {/* Orbiting Orange Icon Badge 3: Cloud Upload (Mid Right ~4:00) */}
+              <div className="absolute right-1 sm:right-2 bottom-11 sm:bottom-14 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#E8611A] text-white flex items-center justify-center shadow-md z-20">
+                <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" />
+                  <polyline points="12 13 12 9 10 11" />
+                </svg>
+              </div>
+
+              {/* Orbiting Orange Icon Badge 4: Settings / Gear (Bottom ~6:00) */}
+              <div className="absolute bottom-1 sm:bottom-2 left-[51%] -translate-x-1/2 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#E8611A] text-white flex items-center justify-center shadow-md z-20">
+                <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="3" />
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                </svg>
+              </div>
             </div>
           </motion.div>
 
@@ -282,13 +301,12 @@ export default function AssessmentMappingPage() {
               onDragOver={(e) => e.preventDefault()}
               onDrop={handleQpDrop}
               onClick={() => !qpFile && qpInputRef.current?.click()}
-              className={`rounded-3xl border-2 border-dashed p-6 sm:p-8 flex flex-col items-center justify-center text-center transition-all min-h-[200px] bg-white ${
-                qpDragActive
+              className={`rounded-[24px] border-[1.5px] border-dashed p-7 sm:p-9 flex flex-col items-center justify-center text-center transition-all min-h-[210px] bg-white ${qpDragActive
                   ? "border-[#E8611A] bg-[#FEF0E8]/40 scale-[1.01]"
                   : qpFile
-                  ? "border-[#E5E4DF] bg-white"
-                  : "border-[#D1D5DB] hover:border-[#E8611A] hover:bg-[#FEF0E8]/20 cursor-pointer"
-              }`}
+                    ? "border-[#E5E4DF] bg-white"
+                    : "border-[#D5D4CE] hover:border-[#E8611A] hover:bg-[#FEF0E8]/20 cursor-pointer"
+                }`}
             >
               <input
                 ref={qpInputRef}
@@ -299,15 +317,23 @@ export default function AssessmentMappingPage() {
               />
 
               {!qpFile ? (
-                <div className="space-y-3">
-                  <div className="w-12 h-12 rounded-2xl bg-[#FEF0E8] flex items-center justify-center mx-auto text-[#E8611A]">
-                    <UploadCloud className="w-6 h-6" />
+                <div className="space-y-3.5 flex flex-col items-center">
+                  {/* Upload Icon Box */}
+                  <div className="w-12 h-12 rounded-[14px] bg-[#F5F4F0] flex items-center justify-center text-[#1A1A1A] shadow-sm">
+                    <svg className="w-5 h-5 text-[#1A1A1A]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+                      <polyline points="7 9 12 4 17 9" />
+                      <line x1="12" y1="4" x2="12" y2="16" />
+                    </svg>
                   </div>
                   <div>
-                    <p className="text-base font-bold text-[#1A1A1A]">
-                      Upload <span className="text-[#E8611A]">Question Paper</span>
+                    <p
+                      className="text-lg sm:text-xl font-bold text-[#1A1A1A] tracking-tight"
+                      style={{ fontFamily: "var(--font-bricolage, 'Bricolage Grotesque', sans-serif)" }}
+                    >
+                      Upload <span className="text-[#FF5722]">Question Paper</span>
                     </p>
-                    <p className="text-xs text-[#9CA3AF] mt-1">Max 10MB</p>
+                    <p className="text-xs text-[#9CA3AF] mt-1 font-medium">Max 10MB</p>
                   </div>
                 </div>
               ) : (
@@ -330,7 +356,7 @@ export default function AssessmentMappingPage() {
                       e.stopPropagation();
                       setQpFile(null);
                     }}
-                    className="w-7 h-7 rounded-full bg-[#1A1A1A] text-white flex items-center justify-center hover:bg-red-500 transition-colors shadow-sm"
+                    className="w-7 h-7 rounded-full bg-[#1A1A1A] text-white flex items-center justify-center hover:bg-red-500 transition-colors shadow-sm cursor-pointer"
                   >
                     <X className="w-3.5 h-3.5" />
                   </button>
@@ -345,13 +371,12 @@ export default function AssessmentMappingPage() {
               onDragOver={(e) => e.preventDefault()}
               onDrop={handleAnsDrop}
               onClick={() => !ansFile && ansInputRef.current?.click()}
-              className={`rounded-3xl border-2 border-dashed p-6 sm:p-8 flex flex-col items-center justify-center text-center transition-all min-h-[200px] bg-white ${
-                ansDragActive
+              className={`rounded-[24px] border-[1.5px] border-dashed p-7 sm:p-9 flex flex-col items-center justify-center text-center transition-all min-h-[210px] bg-white ${ansDragActive
                   ? "border-[#E8611A] bg-[#FEF0E8]/40 scale-[1.01]"
                   : ansFile
-                  ? "border-[#E5E4DF] bg-white"
-                  : "border-[#D1D5DB] hover:border-[#E8611A] hover:bg-[#FEF0E8]/20 cursor-pointer"
-              }`}
+                    ? "border-[#E5E4DF] bg-white"
+                    : "border-[#D5D4CE] hover:border-[#E8611A] hover:bg-[#FEF0E8]/20 cursor-pointer"
+                }`}
             >
               <input
                 ref={ansInputRef}
@@ -362,15 +387,23 @@ export default function AssessmentMappingPage() {
               />
 
               {!ansFile ? (
-                <div className="space-y-3">
-                  <div className="w-12 h-12 rounded-2xl bg-[#FEF0E8] flex items-center justify-center mx-auto text-[#E8611A]">
-                    <UploadCloud className="w-6 h-6" />
+                <div className="space-y-3.5 flex flex-col items-center">
+                  {/* Upload Icon Box */}
+                  <div className="w-12 h-12 rounded-[14px] bg-[#F5F4F0] flex items-center justify-center text-[#1A1A1A] shadow-sm">
+                    <svg className="w-5 h-5 text-[#1A1A1A]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+                      <polyline points="7 9 12 4 17 9" />
+                      <line x1="12" y1="4" x2="12" y2="16" />
+                    </svg>
                   </div>
                   <div>
-                    <p className="text-base font-bold text-[#1A1A1A]">
-                      Upload <span className="text-[#E8611A]">Answer Sheet</span>
+                    <p
+                      className="text-lg sm:text-xl font-bold text-[#1A1A1A] tracking-tight"
+                      style={{ fontFamily: "var(--font-bricolage, 'Bricolage Grotesque', sans-serif)" }}
+                    >
+                      Upload <span className="text-[#FF5722]">Answer Sheet</span>
                     </p>
-                    <p className="text-xs text-[#9CA3AF] mt-1">Max 10MB</p>
+                    <p className="text-xs text-[#9CA3AF] mt-1 font-medium">Max 10MB</p>
                   </div>
                 </div>
               ) : (
@@ -393,7 +426,7 @@ export default function AssessmentMappingPage() {
                       e.stopPropagation();
                       setAnsFile(null);
                     }}
-                    className="w-7 h-7 rounded-full bg-[#1A1A1A] text-white flex items-center justify-center hover:bg-red-500 transition-colors shadow-sm"
+                    className="w-7 h-7 rounded-full bg-[#1A1A1A] text-white flex items-center justify-center hover:bg-red-500 transition-colors shadow-sm cursor-pointer"
                   >
                     <X className="w-3.5 h-3.5" />
                   </button>
@@ -407,11 +440,10 @@ export default function AssessmentMappingPage() {
             <button
               onClick={handleStartMapping}
               disabled={!qpFile || !ansFile}
-              className={`px-8 py-3.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all duration-200 ${
-                qpFile && ansFile
+              className={`px-8 py-3.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all duration-200 ${qpFile && ansFile
                   ? "bg-[#1A1A1A] text-white hover:bg-[#2D2D2D] hover:shadow-lg cursor-pointer active:scale-98"
                   : "bg-[#D1D5DB] text-[#9CA3AF] cursor-not-allowed"
-              }`}
+                }`}
             >
               <span>Start Mapping</span>
               <ArrowRight className="w-4 h-4" />
@@ -431,18 +463,26 @@ export default function AssessmentMappingPage() {
             animate={{ scale: 1, opacity: 1 }}
             className="flex flex-col items-center gap-6 text-center max-w-sm"
           >
-            {/* Sparkling stars icon */}
-            <div className="relative w-24 h-24 flex items-center justify-center">
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-                className="absolute inset-0 flex items-center justify-center"
-              >
-                <Sparkles className="w-16 h-16 text-[#E8611A] animate-pulse" />
-              </motion.div>
-              <div className="w-3 h-3 rounded-full bg-[#E8611A] absolute top-2 right-4 animate-ping" />
-              <div className="w-2 h-2 rounded-full bg-[#E8611A] absolute bottom-3 left-4 animate-bounce" />
-            </div>
+            {/* Sparkling stars icon from /icon.png */}
+            <motion.div
+              animate={{
+                scale: [1, 1.08, 1],
+                rotate: [0, 3, -3, 0],
+              }}
+              transition={{
+                duration: 2.8,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+              className="relative w-28 h-28 flex items-center justify-center select-none"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/extract-icon.png"
+                alt="Extracting"
+                className="w-full h-full object-contain pointer-events-none drop-shadow-sm select-none"
+              />
+            </motion.div>
 
             <div className="space-y-2">
               <h2 className="text-2xl font-black text-[#1A1A1A]">Extracting...</h2>
@@ -473,21 +513,19 @@ export default function AssessmentMappingPage() {
             <div className="bg-[#F5F4F0] p-1 rounded-full flex w-full max-w-xs">
               <button
                 onClick={() => setMobileTab("questions")}
-                className={`flex-1 py-1.5 rounded-full text-xs font-bold transition-all ${
-                  mobileTab === "questions"
+                className={`flex-1 py-1.5 rounded-full text-xs font-bold transition-all ${mobileTab === "questions"
                     ? "bg-[#1A1A1A] text-white shadow-sm"
                     : "text-[#6B7280] hover:text-[#1A1A1A]"
-                }`}
+                  }`}
               >
                 Questions
               </button>
               <button
                 onClick={() => setMobileTab("answersheet")}
-                className={`flex-1 py-1.5 rounded-full text-xs font-bold transition-all ${
-                  mobileTab === "answersheet"
+                className={`flex-1 py-1.5 rounded-full text-xs font-bold transition-all ${mobileTab === "answersheet"
                     ? "bg-[#1A1A1A] text-white shadow-sm"
                     : "text-[#6B7280] hover:text-[#1A1A1A]"
-                }`}
+                  }`}
               >
                 Answer Sheet
               </button>
@@ -498,9 +536,8 @@ export default function AssessmentMappingPage() {
           <div className="flex-1 flex flex-col lg:flex-row min-h-0 overflow-hidden">
             {/* ── LEFT COLUMN: EXTRACTED QUESTIONS (Figma 7/9) ── */}
             <div
-              className={`w-full lg:w-[48%] xl:w-[45%] flex flex-col border-r border-[#E5E4DF] bg-white ${
-                mobileTab === "questions" ? "flex" : "hidden lg:flex"
-              }`}
+              className={`w-full lg:w-[48%] xl:w-[45%] flex flex-col border-r border-[#E5E4DF] bg-white ${mobileTab === "questions" ? "flex" : "hidden lg:flex"
+                }`}
             >
               {/* Header */}
               <div className="px-5 py-4 border-b border-[#E5E4DF] flex items-center justify-between shrink-0 bg-white">
@@ -611,21 +648,19 @@ export default function AssessmentMappingPage() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: idx * 0.03 }}
                       onClick={() => handleSelectQuestion(idx)}
-                      className={`rounded-2xl transition-all duration-200 cursor-pointer overflow-hidden border ${
-                        isSelected
+                      className={`rounded-2xl transition-all duration-200 cursor-pointer overflow-hidden border ${isSelected
                           ? "border-2 border-[#E8611A] bg-white shadow-md"
                           : "border-[#E5E4DF] bg-white hover:border-[#D1D5DB] shadow-sm"
-                      }`}
+                        }`}
                     >
                       <div className="p-4 sm:p-5">
                         <div className="flex items-start gap-3.5">
                           {/* Question Number Circle */}
                           <div
-                            className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black shrink-0 transition-colors ${
-                              isSelected
+                            className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black shrink-0 transition-colors ${isSelected
                                 ? "bg-[#E8611A] text-white shadow-sm"
                                 : "bg-[#4B5563] text-white"
-                            }`}
+                              }`}
                           >
                             {q.question_number}
                           </div>
@@ -640,15 +675,14 @@ export default function AssessmentMappingPage() {
                           {/* Score Badge */}
                           <div className="flex items-center gap-2 shrink-0">
                             <span
-                              className={`text-xs font-bold px-2.5 py-1 rounded-full ${
-                                q.status === "correct"
+                              className={`text-xs font-bold px-2.5 py-1 rounded-full ${q.status === "correct"
                                   ? "bg-[#DCFCE7] text-[#15803D]"
                                   : q.status === "partially_correct"
-                                  ? "bg-[#FEF0E8] text-[#E8611A]"
-                                  : q.status === "unanswered"
-                                  ? "bg-[#F3F4F6] text-[#9CA3AF]"
-                                  : "bg-[#FEE2E2] text-[#B91C1C]"
-                              }`}
+                                    ? "bg-[#FEF0E8] text-[#E8611A]"
+                                    : q.status === "unanswered"
+                                      ? "bg-[#F3F4F6] text-[#9CA3AF]"
+                                      : "bg-[#FEE2E2] text-[#B91C1C]"
+                                }`}
                             >
                               {q.is_answered
                                 ? `${q.score} / ${q.max_marks}`
@@ -715,11 +749,10 @@ export default function AssessmentMappingPage() {
                                           setCurrentPage(box.page);
                                           setMobileTab("answersheet");
                                         }}
-                                        className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
-                                          currentPage === box.page && isSelected
+                                        className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${currentPage === box.page && isSelected
                                             ? "bg-[#22C55E] text-white shadow-sm"
                                             : "bg-[#F5F4F0] border border-[#E5E4DF] text-[#1A1A1A] hover:bg-[#E5E4DF]"
-                                        }`}
+                                          }`}
                                       >
                                         <span>📍 Page {box.page}</span>
                                         {q.boxes!.length > 1 && <span className="text-[10px] opacity-80">(Part {bIdx + 1})</span>}
@@ -769,11 +802,10 @@ export default function AssessmentMappingPage() {
                           <motion.div
                             key={uIdx}
                             onClick={() => handleSelectUnmapped(uIdx)}
-                            className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
-                              isSelectedUnmapped
+                            className={`p-3.5 rounded-xl border transition-all cursor-pointer ${isSelectedUnmapped
                                 ? "border-2 border-[#F59E0B] bg-[#FFFBEB] shadow-md"
                                 : "border-[#E5E4DF] bg-white hover:border-[#D1D5DB]"
-                            }`}
+                              }`}
                           >
                             <div className="flex items-start justify-between gap-2">
                               <span className="text-xs font-bold text-[#D97706] bg-[#FEF3C7] px-2 py-0.5 rounded-md">
@@ -808,9 +840,8 @@ export default function AssessmentMappingPage() {
 
             {/* ── RIGHT COLUMN: ANSWER SHEET VIEWER (Figma 7/9 & 9/9) ── */}
             <div
-              className={`w-full lg:w-[52%] xl:w-[55%] flex flex-col bg-[#1A1A1A] ${
-                mobileTab === "answersheet" ? "flex" : "hidden lg:flex"
-              }`}
+              className={`w-full lg:w-[52%] xl:w-[55%] flex flex-col bg-[#1A1A1A] ${mobileTab === "answersheet" ? "flex" : "hidden lg:flex"
+                }`}
             >
               {/* Toolbar */}
               <div className="px-5 py-3.5 bg-[#1A1A1A] border-b border-zinc-800 flex items-center justify-between text-white shrink-0">
@@ -896,19 +927,17 @@ export default function AssessmentMappingPage() {
                             key={`${qIdx}-${bIdx}`}
                             onClick={() => handleSelectQuestion(qIdx)}
                             style={{ top, left, width, height }}
-                            className={`absolute rounded-xl transition-all duration-200 cursor-pointer ${
-                              isSelected
+                            className={`absolute rounded-xl transition-all duration-200 cursor-pointer ${isSelected
                                 ? "border-[3px] border-[#22C55E] bg-[#22C55E]/10 ring-4 ring-[#22C55E]/20 shadow-lg z-20"
                                 : "border-2 border-dashed border-[#22C55E]/60 bg-[#22C55E]/5 hover:border-[#22C55E] z-10"
-                            }`}
+                              }`}
                           >
                             {/* Question Tag Badge */}
                             <span
-                              className={`absolute -top-3.5 left-2 px-2.5 py-0.5 rounded-md text-[11px] font-black shadow-md ${
-                                isSelected
+                              className={`absolute -top-3.5 left-2 px-2.5 py-0.5 rounded-md text-[11px] font-black shadow-md ${isSelected
                                   ? "bg-[#22C55E] text-white"
                                   : "bg-[#15803D] text-white opacity-90"
-                              }`}
+                                }`}
                             >
                               Q{q.question_number}
                             </span>
@@ -933,18 +962,16 @@ export default function AssessmentMappingPage() {
                             key={`u-${uIdx}-${bIdx}`}
                             onClick={() => handleSelectUnmapped(uIdx)}
                             style={{ top, left, width, height }}
-                            className={`absolute rounded-xl transition-all duration-200 cursor-pointer ${
-                              isUnmappedSelected
+                            className={`absolute rounded-xl transition-all duration-200 cursor-pointer ${isUnmappedSelected
                                 ? "border-[3px] border-[#F59E0B] bg-[#F59E0B]/20 ring-4 ring-[#F59E0B]/30 shadow-lg z-20"
                                 : "border-2 border-dashed border-[#F59E0B]/70 bg-[#F59E0B]/10 hover:border-[#F59E0B] z-10"
-                            }`}
+                              }`}
                           >
                             <span
-                              className={`absolute -top-3.5 left-2 px-2.5 py-0.5 rounded-md text-[11px] font-black shadow-md ${
-                                isUnmappedSelected
+                              className={`absolute -top-3.5 left-2 px-2.5 py-0.5 rounded-md text-[11px] font-black shadow-md ${isUnmappedSelected
                                   ? "bg-[#F59E0B] text-white"
                                   : "bg-[#D97706] text-white opacity-90"
-                              }`}
+                                }`}
                             >
                               {uItem.raw_label || "Extra Answer"}
                             </span>
