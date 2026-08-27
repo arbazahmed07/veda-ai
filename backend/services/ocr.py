@@ -2,7 +2,7 @@ import base64
 import json
 import io
 import logging
-from PIL import Image
+from PIL import Image, ImageOps
 from config import settings
 
 logger = logging.getLogger(__name__)
@@ -83,12 +83,22 @@ class OCRService:
         """Async: extract text from an image using Gemini Vision."""
         try:
             img = Image.open(io.BytesIO(image_bytes))
+            # Auto-rotate based on EXIF orientation (handles rotated phone photos)
+            try:
+                img = ImageOps.exif_transpose(img)
+            except Exception:
+                pass  # No EXIF data — continue as-is
             fmt = img.format or "PNG"
             mime = f"image/{fmt.lower()}"
             if mime == "image/jpg":
                 mime = "image/jpeg"
 
-            b64 = base64.standard_b64encode(image_bytes).decode("utf-8")
+            # Re-encode after EXIF correction so Gemini sees the properly oriented image
+            buf = io.BytesIO()
+            save_fmt = "JPEG" if mime == "image/jpeg" else "PNG"
+            img.save(buf, format=save_fmt)
+            corrected_bytes = buf.getvalue()
+            b64 = base64.standard_b64encode(corrected_bytes).decode("utf-8")
 
             from langchain_core.messages import HumanMessage
 

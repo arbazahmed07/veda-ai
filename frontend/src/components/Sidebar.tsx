@@ -10,8 +10,8 @@ import {
   Library,
   Settings,
   X,
-  ChevronRight,
-  ChevronLeft,
+  PanelLeft,
+  PanelLeftClose,
   Sparkles,
   LogOut,
 } from "lucide-react";
@@ -93,9 +93,9 @@ export default function Sidebar() {
                 <button
                   onClick={toggleCollapsed}
                   title="Collapse sidebar"
-                  className="p-1.5 rounded-lg text-[#9CA3AF] hover:text-[#1A1A1A] hover:bg-[#F0EFE9] transition-all duration-200 shrink-0"
+                  className="w-8 h-8 rounded-lg border border-[#E5E4DF] flex items-center justify-center text-[#9CA3AF] hover:text-[#1A1A1A] hover:bg-[#F5F4F0] hover:border-[#D1D5DB] transition-all duration-200 shrink-0 cursor-pointer"
                 >
-                  <ChevronLeft className="w-4 h-4" />
+                  <PanelLeftClose className="w-4 h-4" />
                 </button>
               )}
             </>
@@ -107,9 +107,9 @@ export default function Sidebar() {
               <button
                 onClick={toggleCollapsed}
                 title="Expand sidebar"
-                className="p-1.5 rounded-lg text-[#9CA3AF] hover:text-[#1A1A1A] hover:bg-[#F0EFE9] transition-all duration-200"
+                className="w-8 h-8 rounded-lg border border-[#E5E4DF] flex items-center justify-center text-[#9CA3AF] hover:text-[#1A1A1A] hover:bg-[#F5F4F0] hover:border-[#D1D5DB] transition-all duration-200 cursor-pointer"
               >
-                <ChevronRight className="w-4 h-4" />
+                <PanelLeft className="w-4 h-4" />
               </button>
             </>
           )}
@@ -256,9 +256,9 @@ export default function Sidebar() {
               <button
                 onClick={toggleCollapsed}
                 title="Expand sidebar"
-                className="p-1.5 rounded-lg text-[#9CA3AF] hover:text-[#1A1A1A] hover:bg-[#F0EFE9] transition-all"
+                className="w-8 h-8 rounded-lg border border-[#E5E4DF] flex items-center justify-center text-[#9CA3AF] hover:text-[#1A1A1A] hover:bg-[#F5F4F0] hover:border-[#D1D5DB] transition-all cursor-pointer"
               >
-                <ChevronRight className="w-4 h-4" />
+                <PanelLeft className="w-4 h-4" />
               </button>
             </div>
           )}

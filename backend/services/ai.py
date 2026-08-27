@@ -1,5 +1,5 @@
 from typing import List, Optional
-from PIL import Image
+from PIL import Image, ImageOps
 
 import json
 import io
@@ -355,12 +355,22 @@ Return ONLY valid JSON (no markdown, no backticks):
         """Single Gemini Vision call: reads image, corrects text, and grades."""
 
         img = Image.open(io.BytesIO(image_bytes))
+        # Auto-rotate based on EXIF orientation (handles rotated phone photos)
+        try:
+            img = ImageOps.exif_transpose(img)
+        except Exception:
+            pass  # No EXIF data — continue as-is
         fmt = img.format or "PNG"
         mime = f"image/{fmt.lower()}"
         if mime == "image/jpg":
             mime = "image/jpeg"
 
-        b64 = base64.standard_b64encode(image_bytes).decode("utf-8")
+        # Re-encode after EXIF correction
+        buf = io.BytesIO()
+        save_fmt = "JPEG" if mime == "image/jpeg" else "PNG"
+        img.save(buf, format=save_fmt)
+        corrected_bytes = buf.getvalue()
+        b64 = base64.standard_b64encode(corrected_bytes).decode("utf-8")
 
         vision_llm = ChatGoogleGenerativeAI(
             model=settings.MODEL_NAME,

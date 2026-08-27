@@ -2,15 +2,21 @@ import os
 import io
 import json
 import base64
+import time
 import logging
 from typing import List, Dict, Any, Optional
-from PIL import Image
+from PIL import Image, ImageOps
 import pymupdf  # PyMuPDF / fitz
 from google import genai
 from google.genai import types
 from config import settings
 
 logger = logging.getLogger(__name__)
+
+# ── Edge-case constants ───────────────────────────────────────
+MAX_PDF_PAGES = 20  # Cap to avoid Gemini context overflow
+MAX_GEMINI_RETRIES = 3
+GEMINI_RETRY_BASE_DELAY = 2  # seconds
 
 def pdf_bytes_to_images(pdf_bytes: bytes, dpi: int = 150) -> List[Dict[str, Any]]:
     """Convert PDF bytes to list of base64 JPEG images with dimensions."""
@@ -35,8 +41,13 @@ def pdf_bytes_to_images(pdf_bytes: bytes, dpi: int = 150) -> List[Dict[str, Any]
     return pages
 
 def image_bytes_to_page(image_bytes: bytes, page_num: int = 1) -> Dict[str, Any]:
-    """Convert raw image bytes to page dict."""
+    """Convert raw image bytes to page dict with EXIF auto-orient."""
     img = Image.open(io.BytesIO(image_bytes))
+    # Auto-rotate based on EXIF orientation (handles rotated/skewed photos)
+    try:
+        img = ImageOps.exif_transpose(img)
+    except Exception:
+        pass  # No EXIF data or unsupported — continue as-is
     if img.mode in ("RGBA", "P"):
         img = img.convert("RGB")
     buf = io.BytesIO()
@@ -51,6 +62,41 @@ def image_bytes_to_page(image_bytes: bytes, page_num: int = 1) -> Dict[str, Any]
         "_raw_bytes": jpeg_bytes,
     }
 
+
+def _clamp(val: Any, lo: int = 0, hi: int = 1000) -> int:
+    """Clamp a value to [lo, hi] range, coercing to int."""
+    try:
+        return max(lo, min(hi, int(val)))
+    except (TypeError, ValueError):
+        return lo
+
+
+def _sanitize_boxes(items: List[Dict[str, Any]], total_pages: int) -> List[Dict[str, Any]]:
+    """Validate and clamp bounding box coordinates in mapped_questions or unmapped_answers."""
+    for item in items:
+        clean_boxes = []
+        for box in item.get("boxes", []):
+            page = box.get("page", 1)
+            if not isinstance(page, int) or page < 1 or page > total_pages:
+                logger.warning(f"Bounding box page {page} out of range [1, {total_pages}], clamping.")
+                page = max(1, min(total_pages, int(page) if isinstance(page, (int, float)) else 1))
+            ymin = _clamp(box.get("ymin", 0))
+            xmin = _clamp(box.get("xmin", 0))
+            ymax = _clamp(box.get("ymax", 1000))
+            xmax = _clamp(box.get("xmax", 1000))
+            # Ensure min < max; swap if inverted
+            if ymin > ymax:
+                ymin, ymax = ymax, ymin
+            if xmin > xmax:
+                xmin, xmax = xmax, xmin
+            # Skip degenerate boxes (zero area)
+            if ymin == ymax or xmin == xmax:
+                logger.warning(f"Skipping degenerate bounding box: {box}")
+                continue
+            clean_boxes.append({"page": page, "ymin": ymin, "xmin": xmin, "ymax": ymax, "xmax": xmax})
+        item["boxes"] = clean_boxes
+    return items
+
 class AssessmentMapperService:
     def __init__(self):
         api_key = settings.GEMINI_API_KEY
@@ -60,18 +106,33 @@ class AssessmentMapperService:
         self.model_name = settings.MODEL_NAME or "gemini-1.5-pro"
 
     def _call_gemini_json(self, contents: list, prompt: str) -> Dict[str, Any]:
-        """Send multimodal request to Gemini and parse JSON response."""
+        """Send multimodal request to Gemini and parse JSON response with retry logic."""
         full_contents = [*contents, prompt]
-        response = self.client.models.generate_content(
-            model=self.model_name,
-            contents=full_contents,
-            config=types.GenerateContentConfig(
-                response_mime_type="application/json",
-                temperature=0.1,
-            ),
-        )
-        text = response.text
-        return json.loads(text)
+        last_error = None
+        for attempt in range(1, MAX_GEMINI_RETRIES + 1):
+            try:
+                response = self.client.models.generate_content(
+                    model=self.model_name,
+                    contents=full_contents,
+                    config=types.GenerateContentConfig(
+                        response_mime_type="application/json",
+                        temperature=0.1,
+                    ),
+                )
+                text = response.text
+                return json.loads(text)
+            except (json.JSONDecodeError, Exception) as e:
+                last_error = e
+                if attempt < MAX_GEMINI_RETRIES:
+                    delay = GEMINI_RETRY_BASE_DELAY * (2 ** (attempt - 1))  # exponential backoff
+                    logger.warning(
+                        f"Gemini API call failed (attempt {attempt}/{MAX_GEMINI_RETRIES}): {e}. "
+                        f"Retrying in {delay}s..."
+                    )
+                    time.sleep(delay)
+                else:
+                    logger.error(f"Gemini API call failed after {MAX_GEMINI_RETRIES} attempts: {e}")
+        raise ValueError(f"Gemini API failed after {MAX_GEMINI_RETRIES} retries: {last_error}")
 
     async def process_assessment(
         self,
@@ -98,6 +159,18 @@ class AssessmentMapperService:
             ans_pages = pdf_bytes_to_images(ans_bytes)
         else:
             ans_pages = [image_bytes_to_page(ans_bytes, 1)]
+
+        # 3. Enforce page limits to avoid Gemini context overflow
+        if len(qp_pages) > MAX_PDF_PAGES:
+            logger.warning(
+                f"Question paper has {len(qp_pages)} pages, truncating to {MAX_PDF_PAGES}."
+            )
+            qp_pages = qp_pages[:MAX_PDF_PAGES]
+        if len(ans_pages) > MAX_PDF_PAGES:
+            logger.warning(
+                f"Answer sheet has {len(ans_pages)} pages, truncating to {MAX_PDF_PAGES}."
+            )
+            ans_pages = ans_pages[:MAX_PDF_PAGES]
 
         logger.info(f"QP has {len(qp_pages)} pages, Answer Sheet has {len(ans_pages)} pages.")
 
@@ -224,6 +297,11 @@ class AssessmentMapperService:
         mapped_questions = mapping_result.get("mapped_questions", [])
         overall_summary = mapping_result.get("overall_summary", {})
         unmapped_answers = mapping_result.get("unmapped_answers", [])
+
+        # Sanitize bounding box coordinates from AI output
+        total_ans_pages = len(ans_pages)
+        mapped_questions = _sanitize_boxes(mapped_questions, total_ans_pages)
+        unmapped_answers = _sanitize_boxes(unmapped_answers, total_ans_pages)
 
         # Remove raw bytes before returning JSON to frontend
         clean_qp_pages = [

@@ -166,7 +166,14 @@ async def evaluate_exam_images(
     if not exam:
         raise HTTPException(status_code=404, detail="Exam not found")
 
-    questions_by_num = {q["number"]: q for q in exam["questions"]}
+    questions_by_num = {}
+    for q in exam["questions"]:
+        if q["number"] in questions_by_num:
+            logger.warning(
+                f"[{student_name}] Duplicate question number {q['number']} in exam '{exam['title']}' — "
+                f"later definition will overwrite earlier one."
+            )
+        questions_by_num[q["number"]] = q
 
     logger.info(
         f"[{student_name}] evaluate-exam-images — exam '{exam['title']}', "
