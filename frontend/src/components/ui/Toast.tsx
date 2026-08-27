@@ -55,9 +55,27 @@ function ToastCard({ toast, onDismiss }: { toast: ToastItem; onDismiss: (id: num
   }, [toast.id, onDismiss]);
 
   const config = {
-    error: { icon: AlertCircle, bg: "bg-red-500/10", border: "border-red-500/30", text: "text-red-400", iconColor: "text-red-400" },
-    success: { icon: CheckCircle2, bg: "bg-green-500/10", border: "border-green-500/30", text: "text-green-400", iconColor: "text-green-400" },
-    warning: { icon: AlertTriangle, bg: "bg-amber-500/10", border: "border-amber-500/30", text: "text-amber-400", iconColor: "text-amber-400" },
+    error: {
+      icon: AlertCircle,
+      badgeBg: "bg-[#FEF2F2]",
+      iconColor: "text-[#DC2626]",
+      border: "border-[#FEE2E2]",
+      accentBar: "bg-[#DC2626]",
+    },
+    success: {
+      icon: CheckCircle2,
+      badgeBg: "bg-[#F0FDF4]",
+      iconColor: "text-[#16A34A]",
+      border: "border-[#DCFCE7]",
+      accentBar: "bg-[#16A34A]",
+    },
+    warning: {
+      icon: AlertTriangle,
+      badgeBg: "bg-[#FEF0E8]",
+      iconColor: "text-[#E8611A]",
+      border: "border-[#FDDAC7]",
+      accentBar: "bg-[#E8611A]",
+    },
   }[toast.variant];
 
   const Icon = config.icon;
@@ -68,13 +86,26 @@ function ToastCard({ toast, onDismiss }: { toast: ToastItem; onDismiss: (id: num
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 8, scale: 0.95 }}
       transition={{ duration: 0.2 }}
-      className={`pointer-events-auto flex items-start gap-2.5 px-4 py-3 rounded-xl border ${config.bg} ${config.border} backdrop-blur-md shadow-xl shadow-black/30`}
+      className={`pointer-events-auto relative overflow-hidden flex items-center gap-3 px-4 py-3.5 rounded-2xl bg-white border ${config.border} shadow-[0_8px_24px_rgba(0,0,0,0.08)]`}
     >
-      <Icon className={`w-4 h-4 mt-0.5 shrink-0 ${config.iconColor}`} />
-      <p className={`text-sm flex-1 ${config.text}`}>{toast.message}</p>
+      {/* Left subtle accent strip */}
+      <div className={`absolute left-0 top-0 bottom-0 w-1 ${config.accentBar}`} />
+
+      {/* Icon badge circle */}
+      <div className={`w-8 h-8 rounded-xl ${config.badgeBg} flex items-center justify-center shrink-0`}>
+        <Icon className={`w-4 h-4 ${config.iconColor}`} strokeWidth="2.2" />
+      </div>
+
+      {/* Message */}
+      <p className="text-[13.5px] font-medium text-[#1A1A1A] flex-1 leading-snug">
+        {toast.message}
+      </p>
+
+      {/* Close button */}
       <button
         onClick={() => onDismiss(toast.id)}
-        className="shrink-0 p-0.5 rounded text-zinc-500 hover:text-white transition-colors"
+        className="shrink-0 p-1.5 rounded-lg text-[#9CA3AF] hover:text-[#1A1A1A] hover:bg-[#F5F4F0] transition-colors cursor-pointer"
+        aria-label="Dismiss notification"
       >
         <X className="w-3.5 h-3.5" />
       </button>
