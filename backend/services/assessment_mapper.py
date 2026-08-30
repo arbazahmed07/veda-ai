@@ -2,7 +2,7 @@ import os
 import io
 import json
 import base64
-import time
+import asyncio
 import logging
 from typing import List, Dict, Any, Optional
 from PIL import Image, ImageOps
@@ -15,8 +15,12 @@ logger = logging.getLogger(__name__)
 
 # ── Edge-case constants ───────────────────────────────────────
 MAX_PDF_PAGES = 20  # Cap to avoid Gemini context overflow
-MAX_GEMINI_RETRIES = 3
+MAX_GEMINI_RETRIES = 5
 GEMINI_RETRY_BASE_DELAY = 2  # seconds
+GEMINI_RETRY_MAX_DELAY = 60  # seconds — cap for exponential backoff
+
+# HTTP status codes that are transient and worth retrying
+_RETRYABLE_STATUS_CODES = {429, 500, 503, 504}
 
 def pdf_bytes_to_images(pdf_bytes: bytes, dpi: int = 150) -> List[Dict[str, Any]]:
     """Convert PDF bytes to list of base64 JPEG images with dimensions."""
@@ -105,8 +109,17 @@ class AssessmentMapperService:
         self.client = genai.Client(api_key=api_key)
         self.model_name = settings.MODEL_NAME or "gemini-1.5-pro"
 
-    def _call_gemini_json(self, contents: list, prompt: str) -> Dict[str, Any]:
-        """Send multimodal request to Gemini and parse JSON response with retry logic."""
+    def _is_retryable(self, exc: Exception) -> bool:
+        """Return True if the exception is a transient server error worth retrying."""
+        msg = str(exc)
+        # Catch google-genai / httpx status-code signals
+        for code in _RETRYABLE_STATUS_CODES:
+            if str(code) in msg:
+                return True
+        return False
+
+    async def _call_gemini_json(self, contents: list, prompt: str) -> Dict[str, Any]:
+        """Send multimodal request to Gemini and parse JSON response with async retry logic."""
         full_contents = [*contents, prompt]
         last_error = None
         for attempt in range(1, MAX_GEMINI_RETRIES + 1):
@@ -121,17 +134,25 @@ class AssessmentMapperService:
                 )
                 text = response.text
                 return json.loads(text)
-            except (json.JSONDecodeError, Exception) as e:
+            except json.JSONDecodeError as e:
+                # Malformed JSON is not a transient error — fail fast
+                logger.error(f"Gemini returned invalid JSON: {e}")
+                raise ValueError(f"Gemini returned invalid JSON: {e}") from e
+            except Exception as e:
                 last_error = e
-                if attempt < MAX_GEMINI_RETRIES:
-                    delay = GEMINI_RETRY_BASE_DELAY * (2 ** (attempt - 1))  # exponential backoff
+                if attempt < MAX_GEMINI_RETRIES and self._is_retryable(e):
+                    delay = min(
+                        GEMINI_RETRY_BASE_DELAY * (2 ** (attempt - 1)),
+                        GEMINI_RETRY_MAX_DELAY,
+                    )  # exponential backoff capped at max delay
                     logger.warning(
                         f"Gemini API call failed (attempt {attempt}/{MAX_GEMINI_RETRIES}): {e}. "
                         f"Retrying in {delay}s..."
                     )
-                    time.sleep(delay)
+                    await asyncio.sleep(delay)  # non-blocking sleep
                 else:
-                    logger.error(f"Gemini API call failed after {MAX_GEMINI_RETRIES} attempts: {e}")
+                    logger.error(f"Gemini API call failed after {attempt} attempts: {e}")
+                    raise ValueError(f"Gemini API failed after {attempt} retries: {e}") from e
         raise ValueError(f"Gemini API failed after {MAX_GEMINI_RETRIES} retries: {last_error}")
 
     async def process_assessment(
@@ -207,7 +228,7 @@ class AssessmentMapperService:
         }
         """
 
-        qp_result = self._call_gemini_json(qp_images_parts, qp_prompt)
+        qp_result = await self._call_gemini_json(qp_images_parts, qp_prompt)
         extracted_questions = qp_result.get("questions", [])
         logger.info(f"Extracted {len(extracted_questions)} questions from QP.")
 
@@ -293,7 +314,7 @@ class AssessmentMapperService:
         }}
         """
 
-        mapping_result = self._call_gemini_json(ans_images_parts, mapping_prompt)
+        mapping_result = await self._call_gemini_json(ans_images_parts, mapping_prompt)
         mapped_questions = mapping_result.get("mapped_questions", [])
         overall_summary = mapping_result.get("overall_summary", {})
         unmapped_answers = mapping_result.get("unmapped_answers", [])
